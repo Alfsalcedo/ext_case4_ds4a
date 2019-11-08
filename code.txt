@@ -1,0 +1,15 @@
+CREATE TABLE trades (
+Number INT,
+"Trade type" VARCHAR(20),
+"Entry time" TIMESTAMP,	
+Exposure VARCHAR(50),
+"Entry balance" FLOAT,
+"Exit balance" FLOAT,
+Profit FLOAT,
+"Pnl (incl fees)" FLOAT,
+Exchange VARCHAR(20),
+Margin INT,
+"BTC Price" FLOAT
+);
+
+SELECT * FROM trades LIMIT 10;
