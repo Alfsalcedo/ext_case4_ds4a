@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from sqlalchemy import create_engine
 import os
 
+my_user = os.environ.get('DB_USER')
 my_passwd = os.environ.get('DB_USER_PASSWORD')
 
 def pnl_by_type(df, exchange, margin, start_date, end_date):
@@ -21,8 +22,8 @@ def pnl_by_type(df, exchange, margin, start_date, end_date):
 
 def filter_df(df, exchange, margin, start_date, end_date):
 
-    df_temp = df[(df['Exchange'] == exchange) & 
-                 (df['Margin'] == int(margin)) & 
+    df_temp = df[(df['exchange'] == exchange) & 
+                 (df['margin'] == int(margin)) & 
                  (df['Entry time'] > start_date) & 
                  (df['Entry time'] <= end_date)]
     return df_temp
@@ -55,7 +56,7 @@ def calc_strat_returns(dff):
     returns = (end_value * 100/ start_value)-100
     return returns
 
-engine = create_engine('postgresql://test:test@nps-demo-instance.cisfmpv8swak.us-east-2.rds.amazonaws.com/trades')
+engine = create_engine('postgresql://'+my_user+':'+my_passwd+'@nps-demo-instance.cisfmpv8swak.us-east-2.rds.amazonaws.com/strategy')
 df = pd.read_sql("SELECT * from trades", engine.connect(), parse_dates=('OCCURRED_ON_DATE',))
 df['YearMonth'] = df['Entry time'].dt.strftime('%Y-%m')
 
@@ -86,7 +87,7 @@ app.layout = html.Div(children=[
                                     dcc.RadioItems(
                                         id="exchange-select",
                                         options=[
-                                            {'label': label, 'value': label} for label in df['Exchange'].unique()
+                                            {'label': label, 'value': label} for label in df['exchange'].unique()
                                         ],
                                         value='Bitmex',
                                         labelStyle={'display': 'inline-block'}
@@ -101,7 +102,7 @@ app.layout = html.Div(children=[
                                     dcc.RadioItems(
                                         id="leverage-select",
                                         options=[
-                                            {'label': str(label), 'value': str(label)} for label in df['Margin'].unique()
+                                            {'label': str(label), 'value': str(label)} for label in df['margin'].unique()
                                         ],
                                         value='1',
                                         labelStyle={'display': 'inline-block'}
@@ -326,4 +327,4 @@ def update_balance(exchange, leverage, start_date, end_date):
     
 
 if __name__ == '__main__':
-app.run_server(debug=True, host= '0.0.0.0')
+    app.run_server(debug=True, host= '0.0.0.0')
